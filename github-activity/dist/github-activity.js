@@ -336,8 +336,8 @@ export class GitHubActivity extends Base {
                 element.textContent = `${number.format(value)}${unit}`;
             };
             const start = performance.now();
-            const tick = (now) => {
-                const progress = Math.min(1, (now - start) / COUNT);
+            const tick = () => {
+                const progress = Math.min(1, Math.max(0, (performance.now() - start) / COUNT));
                 render(Math.round(target * (1 - (1 - progress) ** 3)));
                 if (progress < 1 && element.isConnected)
                     requestAnimationFrame(tick);
