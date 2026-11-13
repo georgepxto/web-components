@@ -2,12 +2,60 @@
 
 A dependency-free web component that renders a GitHub contribution calendar, with stats, month labels, a legend and a wave entrance animation. Works in any stack: plain HTML, React, Vue, Svelte, Astro, Rails templates.
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/georgepxto/web-components/main/github-activity/screenshots/dark.png">
+  <img alt="Contribution calendar with three stats above it: 1,091 contributions, a 7-day longest streak and Wednesday as the most active day" src="https://raw.githubusercontent.com/georgepxto/web-components/main/github-activity/screenshots/light.png" width="880">
+</picture>
+
 - No runtime dependencies, Shadow DOM, under 8 kB gzipped
 - Light and dark themes out of the box, fully themable with CSS custom properties and `::part()`
 - English, Portuguese and Spanish built in, any other language through `labels`; dates and month names come from `Intl`
 - Responsive through container queries: splits into two rows in narrow containers
 - Accessible: the graph is a labelled image, every day has a tooltip, motion respects `prefers-reduced-motion`
 - Ships a build-time fetcher and a CLI, so your GitHub token never reaches the browser
+
+## Examples
+
+Brazilian Portuguese with a custom dark palette:
+
+<img alt="Calendar in Portuguese on a near-black background with mint green levels" src="https://raw.githubusercontent.com/georgepxto/web-components/main/github-activity/screenshots/custom-pt-br.png" width="880">
+
+```html
+<github-activity src="/github-activity.json" locale="pt-BR" theme="dark"></github-activity>
+
+<style>
+  github-activity {
+    --gha-level-0: #161b18;
+    --gha-accent: #43c97e;
+    --gha-text: #e9eeea;
+    --gha-muted: #a3ada6;
+    --gha-border: #1f2622;
+    --gha-cell-radius: 1px;
+  }
+</style>
+```
+
+Violet, round cells, without the stats:
+
+<img alt="Calendar with round violet cells on a pale lilac background, no stats row" src="https://raw.githubusercontent.com/georgepxto/web-components/main/github-activity/screenshots/violet-round.png" width="880">
+
+```html
+<github-activity src="/github-activity.json" hide="stats"></github-activity>
+
+<style>
+  github-activity {
+    --gha-accent: #7c3aed;
+    --gha-level-0: #ede9fe;
+    --gha-text: #2e1065;
+    --gha-muted: #6d28d9;
+    --gha-cell-radius: 50%;
+  }
+</style>
+```
+
+In narrow containers the stats stack and the year splits into two rows:
+
+<img alt="The component at 390 pixels wide, with stacked stats and the calendar split into two halves" src="https://raw.githubusercontent.com/georgepxto/web-components/main/github-activity/screenshots/mobile.png" width="390">
 
 ## Why the data is fetched separately
 
