@@ -14,6 +14,15 @@ A dependency-free web component that renders a GitHub contribution calendar, wit
 - Accessible: the graph is a labelled image, every day has a tooltip, motion respects `prefers-reduced-motion`
 - Ships a build-time fetcher and a CLI, so your GitHub token never reaches the browser
 
+## Entrance animation
+
+When the calendar scrolls into view, the days fill in as a wave from left to right and the stats count up. Set `animation="none"` to turn it off; it is skipped automatically for visitors who prefer reduced motion.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/georgepxto/web-components/main/github-activity/screenshots/animation-dark.gif">
+  <img alt="The calendar's days appear in a wave from left to right while the stats count up to 1,091 contributions and a 7-day streak" src="https://raw.githubusercontent.com/georgepxto/web-components/main/github-activity/screenshots/animation-light.gif" width="880">
+</picture>
+
 ## Examples
 
 Brazilian Portuguese with a custom dark palette:
