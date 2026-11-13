@@ -1,0 +1,55 @@
+{
+  "name": "@georgepxto/github-activity",
+  "version": "0.1.0",
+  "description": "A dependency-free <github-activity> web component that renders a GitHub contribution calendar, plus a build-time fetcher.",
+  "type": "module",
+  "license": "MIT",
+  "author": "georgepxto",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/georgepxto/web-components.git",
+    "directory": "github-activity"
+  },
+  "keywords": [
+    "web-component",
+    "custom-element",
+    "github",
+    "contributions",
+    "contribution-graph",
+    "heatmap"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./server": {
+      "types": "./dist/server.d.ts",
+      "default": "./dist/server.js"
+    }
+  },
+  "bin": {
+    "github-activity": "./bin/cli.js"
+  },
+  "files": [
+    "dist",
+    "bin"
+  ],
+  "sideEffects": [
+    "./dist/index.js",
+    "./dist/github-activity.js"
+  ],
+  "engines": {
+    "node": ">=18.17"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "npm run build && node --test test/*.test.js",
+    "prepublishOnly": "npm test"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2"
+  }
+}

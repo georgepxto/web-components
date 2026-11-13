@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>github-activity demo</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+      }
+
+      body {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 48px 24px 96px;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: 28px;
+      }
+
+      h2 {
+        margin: 64px 0 16px;
+        font-size: 15px;
+        font-weight: 600;
+      }
+
+      code {
+        font-family: ui-monospace, Menlo, monospace;
+        font-size: 0.9em;
+      }
+
+      .panel {
+        padding: 24px;
+        border: 1px solid #8884;
+        border-radius: 8px;
+      }
+
+      .terminal {
+        background: #0b0e0c;
+        --gha-level-0: #161b18;
+        --gha-accent: #43c97e;
+        --gha-text: #e9eeea;
+        --gha-muted: #a3ada6;
+        --gha-border: #1f2622;
+        --gha-cell-radius: 1px;
+      }
+
+      .narrow {
+        max-width: 420px;
+      }
+    </style>
+    <script type="module" src="../dist/index.js"></script>
+  </head>
+  <body>
+    <h1><code>&lt;github-activity&gt;</code></h1>
+    <p>Synthetic data. Serve this folder over HTTP (for example <code>npx serve ..</code>) and open <code>/demo/</code>.</p>
+
+    <h2>Default, follows the system theme</h2>
+    <div class="panel">
+      <github-activity src="./sample.json" username="octocat"></github-activity>
+    </div>
+
+    <h2>Brazilian Portuguese, dark theme, custom palette</h2>
+    <div class="panel terminal">
+      <github-activity src="./sample.json" locale="pt-BR" theme="dark"></github-activity>
+    </div>
+
+    <h2>Data set as a property, last 90 days, without stats</h2>
+    <div class="panel">
+      <github-activity id="property" locale="es" hide="stats" animation="none"></github-activity>
+    </div>
+
+    <h2>Narrow container</h2>
+    <div class="panel narrow">
+      <github-activity src="./sample.json" hide="legend"></github-activity>
+    </div>
+
+    <script type="module">
+      const days = await (await fetch('./sample.json')).json();
+      document.getElementById('property').data = days.slice(-90);
+    </script>
+  </body>
+</html>
