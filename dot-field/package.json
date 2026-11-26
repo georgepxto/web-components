@@ -1,0 +1,44 @@
+{
+  "name": "@georgepxto/dot-field",
+  "version": "0.1.0",
+  "description": "A dependency-free <dot-field> web component: a canvas dot grid that grows and lights up around the pointer, with a gentle idle ripple.",
+  "type": "module",
+  "license": "MIT",
+  "author": "georgepxto",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/georgepxto/web-components.git",
+    "directory": "dot-field"
+  },
+  "keywords": [
+    "web-component",
+    "custom-element",
+    "canvas",
+    "background",
+    "dot-grid",
+    "pointer"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": [
+    "./dist/index.js",
+    "./dist/dot-field.js"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "npm run build && node --test test/*.test.js",
+    "prepublishOnly": "npm test"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2"
+  }
+}

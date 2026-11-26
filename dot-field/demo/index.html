@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>dot-field demo</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+        --bg: #f6f8f6;
+        --text: #0d1310;
+        --muted: #4a5650;
+        --border: #dbe2dd;
+        background: var(--bg);
+        color: var(--text);
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0b0e0c;
+          --text: #e9eeea;
+          --muted: #a3ada6;
+          --border: #1f2622;
+        }
+      }
+
+      body {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 48px 24px 96px;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: 28px;
+      }
+
+      h2 {
+        margin: 64px 0 16px;
+        font-size: 15px;
+        font-weight: 600;
+      }
+
+      p {
+        color: var(--muted);
+      }
+
+      code {
+        font-family: ui-monospace, Menlo, monospace;
+        font-size: 0.9em;
+      }
+
+      .hero {
+        overflow: hidden;
+        min-height: 360px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+      }
+
+      .hero-copy {
+        padding: 96px 40px;
+      }
+
+      .hero-copy strong {
+        display: block;
+        max-width: 16ch;
+        font-size: clamp(28px, 5vw, 44px);
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+      }
+
+      .card {
+        position: relative;
+        overflow: hidden;
+        min-height: 280px;
+        padding: 32px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+      }
+
+      .card dot-field {
+        position: absolute;
+        inset: 0;
+      }
+
+      .card > p {
+        position: relative;
+        max-width: 36ch;
+        margin: 0;
+      }
+
+      .terminal {
+        min-height: 280px;
+        border-radius: 8px;
+        background: #0b0e0c;
+        --dot-color: rgba(233, 238, 234, 0.14);
+        --dot-active-color: #43c97e;
+      }
+
+      .violet {
+        min-height: 280px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        --dot-active-color: #7c3aed;
+      }
+    </style>
+    <script type="module" src="../dist/index.js"></script>
+  </head>
+  <body>
+    <h1><code>&lt;dot-field&gt;</code></h1>
+    <p>Move the pointer over each box. Serve this folder over HTTP (for example <code>npx serve ..</code>) and open <code>/demo/</code>.</p>
+
+    <h2>Default, with content inside</h2>
+    <dot-field class="hero">
+      <div class="hero-copy">
+        <strong>Dots that notice the pointer.</strong>
+      </div>
+    </dot-field>
+
+    <h2>Behind other content, tracking the parent</h2>
+    <div class="card">
+      <dot-field track="parent"></dot-field>
+      <p>The field sits behind this text with <code>position: absolute</code>. With <code>track="parent"</code> it still reacts while the pointer is over the text.</p>
+    </div>
+
+    <h2>Dense and dark: <code>gap="14" radius="110" grow="2.5" theme="dark"</code></h2>
+    <dot-field class="terminal" gap="14" radius="110" grow="2.5" theme="dark"></dot-field>
+
+    <h2>Sparse, larger dots, violet</h2>
+    <dot-field class="violet" gap="36" dot-size="1.6" radius="200" grow="4"></dot-field>
+  </body>
+</html>
