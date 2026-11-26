@@ -27,10 +27,10 @@ npm install @georgepxto/pull-cord
 import '@georgepxto/pull-cord';
 ```
 
-Or without a build step:
+Or load it from a CDN with no build step:
 
 ```html
-<script type="module" src="https://esm.sh/@georgepxto/pull-cord"></script>
+<script type="module" src="https://cdn.jsdelivr.net/gh/georgepxto/web-components@main/pull-cord/dist/index.js"></script>
 ```
 
 ## Usage
