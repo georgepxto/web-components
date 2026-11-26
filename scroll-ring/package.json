@@ -1,0 +1,44 @@
+{
+  "name": "@georgepxto/scroll-ring",
+  "version": "0.1.0",
+  "description": "A dependency-free <scroll-ring> web component: a back-to-top button with a ring that shows how far the page has been read.",
+  "type": "module",
+  "license": "MIT",
+  "author": "georgepxto",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/georgepxto/web-components.git",
+    "directory": "scroll-ring"
+  },
+  "keywords": [
+    "web-component",
+    "custom-element",
+    "back-to-top",
+    "scroll-to-top",
+    "reading-progress",
+    "progress-ring"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": [
+    "./dist/index.js",
+    "./dist/scroll-ring.js"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "npm run build && node --test test/*.test.js",
+    "prepublishOnly": "npm test"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2"
+  }
+}
