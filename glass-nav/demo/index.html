@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>glass-nav demo</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+        --bg: #f6f8f6;
+        --text: #0d1310;
+        --muted: #4a5650;
+        --border: #dbe2dd;
+        --stripe: #e3e9e5;
+        --accent: #1d8049;
+        background: var(--bg);
+        color: var(--text);
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0b0e0c;
+          --text: #e9eeea;
+          --muted: #a3ada6;
+          --border: #1f2622;
+          --stripe: #161b18;
+          --accent: #43c97e;
+        }
+      }
+
+      body {
+        margin: 0;
+      }
+
+      code {
+        font-family: ui-monospace, Menlo, monospace;
+        font-size: 0.9em;
+      }
+
+      .logo {
+        color: inherit;
+        font-family: ui-monospace, Menlo, monospace;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+      }
+
+      .logo span {
+        color: var(--accent);
+      }
+
+      .cta {
+        display: inline-flex;
+        align-items: center;
+        min-height: 40px;
+        padding: 0 18px;
+        border-radius: 999px;
+        background: var(--accent);
+        color: var(--bg);
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+        white-space: nowrap;
+      }
+
+      main {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 0 24px 160px;
+      }
+
+      header.intro {
+        padding: 140px 0 40px;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: 28px;
+      }
+
+      h2 {
+        margin: 0 0 12px;
+        font-size: 22px;
+      }
+
+      p {
+        max-width: 60ch;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      section {
+        min-height: 70vh;
+        padding: 48px 0;
+        border-top: 1px solid var(--border);
+        background: repeating-linear-gradient(135deg, transparent 0 18px, var(--stripe) 18px 19px);
+      }
+
+      section:focus {
+        outline: none;
+      }
+
+      #contact {
+        min-height: 40vh;
+      }
+    </style>
+    <script type="module" src="../dist/index.js"></script>
+  </head>
+  <body>
+    <glass-nav label="Main">
+      <a slot="logo" class="logo" href="#top">glass-nav<span>/</span></a>
+      <a href="#work">Work</a>
+      <a href="#process">Process</a>
+      <a href="#services">Services</a>
+      <a href="#about">About</a>
+      <a slot="cta" class="cta" href="#contact">Get in touch</a>
+    </glass-nav>
+
+    <main id="top">
+      <header class="intro">
+        <h1><code>&lt;glass-nav&gt;</code></h1>
+        <p>
+          Scroll the page: the link of the section in view lights up. Click a link to scroll to its section, stopping 88px
+          below the top so the bar never covers the heading. Make the window narrow and the bar wraps into two rows.
+        </p>
+      </header>
+
+      <section id="work">
+        <h2>Work</h2>
+        <p>The striped background shows the frosted glass blurring what passes under the bar.</p>
+      </section>
+      <section id="process">
+        <h2>Process</h2>
+        <p>Sections are found from the links' <code>href</code>. Nothing else to configure.</p>
+      </section>
+      <section id="services">
+        <h2>Services</h2>
+        <p>The active link gets <code>aria-current="true"</code> and the <code>--glass-active</code> color.</p>
+      </section>
+      <section id="about">
+        <h2>About</h2>
+        <p>With reduced motion turned on, clicking a link jumps straight to the section.</p>
+      </section>
+      <section id="contact">
+        <h2>Contact</h2>
+        <p>The last section becomes active when the page reaches the bottom, even if it is short.</p>
+      </section>
+    </main>
+  </body>
+</html>
