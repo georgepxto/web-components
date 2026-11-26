@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>step-timeline demo</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+        --bg: #f6f8f6;
+        --text: #0d1310;
+        --muted: #4a5650;
+        --border: #dbe2dd;
+        background: var(--bg);
+        color: var(--text);
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0b0e0c;
+          --text: #e9eeea;
+          --muted: #a3ada6;
+          --border: #1f2622;
+        }
+      }
+
+      body {
+        max-width: 1040px;
+        margin: 0 auto;
+        padding: 48px 24px 0;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: 28px;
+      }
+
+      h2 {
+        margin: 0 0 32px;
+        font-size: 15px;
+        font-weight: 600;
+      }
+
+      p {
+        max-width: 62ch;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      code {
+        font-family: ui-monospace, Menlo, monospace;
+        font-size: 0.9em;
+      }
+
+      section {
+        padding: 72px 0;
+        border-top: 1px solid var(--border);
+      }
+
+      .spacer {
+        height: 70vh;
+      }
+
+      .narrow {
+        max-width: 420px;
+      }
+
+      .violet {
+        --step-accent: #7c3aed;
+        --step-circle-size: 48px;
+        --step-gap: 40px;
+      }
+    </style>
+    <script type="module" src="../dist/index.js"></script>
+  </head>
+  <body>
+    <h1><code>&lt;step-timeline&gt;</code></h1>
+    <p>
+      Serve this folder over HTTP (for example <code>npx serve ..</code>) and open <code>/demo/</code>. Scroll down: the line
+      fills step by step when the first timeline comes into view, and the second one pins to the screen while you scroll.
+    </p>
+
+    <div class="spacer"></div>
+
+    <section>
+      <h2><code>mode="reveal"</code> (default)</h2>
+      <step-timeline>
+        <step-item title="Conversa">Você conta pelo WhatsApp o que precisa resolver. Se for preciso, marcamos uma chamada rápida.</step-item>
+        <step-item title="Proposta">Envio por escrito o que será feito, o prazo e o valor antes de começar.</step-item>
+        <step-item title="Desenvolvimento">Você acompanha versões que já dá para testar e ajusta no caminho.</step-item>
+        <step-item title="Entrega">Coloco no ar, mostro como usar e continuo disponível para ajustes e novas funções.</step-item>
+      </step-timeline>
+    </section>
+
+    <section>
+      <h2><code>mode="pinned"</code></h2>
+      <p>Below 768px or with reduced motion this becomes a plain list.</p>
+      <step-timeline mode="pinned" id="pinned">
+        <step-item title="Conversa">Você conta pelo WhatsApp o que precisa resolver. Se for preciso, marcamos uma chamada rápida.</step-item>
+        <step-item title="Proposta">Envio por escrito o que será feito, o prazo e o valor antes de começar.</step-item>
+        <step-item title="Desenvolvimento">Você acompanha versões que já dá para testar e ajusta no caminho.</step-item>
+        <step-item title="Entrega">Coloco no ar, mostro como usar e continuo disponível para ajustes e novas funções.</step-item>
+      </step-timeline>
+    </section>
+
+    <section>
+      <h2>Narrow container, custom colors and sizes</h2>
+      <div class="narrow">
+        <step-timeline class="violet">
+          <step-item title="Sign up">Create an account with your email.</step-item>
+          <step-item title="Connect">Link your repository. Nothing is <strong>written</strong> to it.</step-item>
+          <step-item title="Ship">Every push builds and deploys a preview.</step-item>
+        </step-timeline>
+      </div>
+    </section>
+
+    <div class="spacer"></div>
+  </body>
+</html>
