@@ -1,0 +1,44 @@
+{
+  "name": "@georgepxto/pull-cord",
+  "version": "0.1.0",
+  "description": "A dependency-free <pull-cord> web component: a hanging light-switch cord you drag to toggle light and dark themes, with spring physics and a circular reveal.",
+  "type": "module",
+  "license": "MIT",
+  "author": "georgepxto",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/georgepxto/web-components.git",
+    "directory": "pull-cord"
+  },
+  "keywords": [
+    "web-component",
+    "custom-element",
+    "dark-mode",
+    "theme-toggle",
+    "light-switch",
+    "view-transitions"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": [
+    "./dist/index.js",
+    "./dist/pull-cord.js"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "npm run build && node --test test/*.test.js",
+    "prepublishOnly": "npm test"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2"
+  }
+}

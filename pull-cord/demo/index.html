@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>pull-cord demo</title>
+    <script>
+      (() => {
+        let theme = null;
+        try {
+          theme = localStorage.getItem('theme');
+        } catch {}
+        if (theme !== 'light' && theme !== 'dark') {
+          theme = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+        }
+        document.documentElement.dataset.theme = theme;
+      })();
+    </script>
+    <style>
+      :root {
+        --bg: #0b0e0c;
+        --surface: #101411;
+        --border: #1f2622;
+        --text: #e9eeea;
+        --muted: #a3ada6;
+        --accent: #43c97e;
+        --serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+        --mono: ui-monospace, 'JetBrains Mono', Menlo, Consolas, monospace;
+        color-scheme: dark;
+      }
+
+      :root[data-theme='light'] {
+        --bg: #f6f8f6;
+        --surface: #edf1ee;
+        --border: #dbe2dd;
+        --text: #0d1310;
+        --muted: #4a5650;
+        --accent: #1d8049;
+        color-scheme: light;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font: 16px/1.6 var(--serif);
+      }
+
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        border-bottom: 1px solid var(--border);
+        background: color-mix(in oklab, var(--bg) 88%, transparent);
+        backdrop-filter: blur(8px);
+      }
+
+      .bar {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        max-width: 960px;
+        height: 60px;
+        margin: 0 auto;
+        padding: 0 24px;
+        font-family: var(--mono);
+        font-size: 13px;
+      }
+
+      .bar pull-cord {
+        position: absolute;
+        top: 100%;
+        right: 26px;
+      }
+
+      .count {
+        color: var(--muted);
+        margin-right: 72px;
+      }
+
+      .count b {
+        color: var(--accent);
+        font-weight: 500;
+      }
+
+      main {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 96px 24px 128px;
+      }
+
+      h1 {
+        max-width: 14ch;
+        margin: 0 0 20px;
+        font-size: clamp(40px, 7vw, 72px);
+        font-weight: 400;
+        line-height: 1.02;
+        letter-spacing: -0.02em;
+      }
+
+      .lede {
+        max-width: 52ch;
+        margin: 0;
+        color: var(--muted);
+        font-size: 19px;
+      }
+
+      h2 {
+        margin: 96px 0 16px;
+        font-family: var(--mono);
+        font-size: 12px;
+        font-weight: 500;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      code {
+        font-family: var(--mono);
+        font-size: 0.86em;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 16px;
+      }
+
+      .stage {
+        position: relative;
+        height: 220px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: var(--surface);
+        overflow: hidden;
+      }
+
+      .stage::before {
+        content: '';
+        position: absolute;
+        inset: 0 0 auto;
+        height: 1px;
+        background: var(--border);
+      }
+
+      .stage pull-cord {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        margin-left: -22px;
+      }
+
+      .stage p {
+        position: absolute;
+        right: 16px;
+        bottom: 12px;
+        left: 16px;
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .brass {
+        --pull-cord-length: 84px;
+        --pull-cord-line: #b08d57;
+        --pull-cord-mount: #b08d57;
+        --pull-cord-pill: #f3e3c3;
+        --pull-cord-pill-border: #b08d57;
+        --pull-cord-pill-hover: #7a5b2e;
+        --pull-cord-dot: #e0901e;
+      }
+
+      .room {
+        transition: background-color 0.4s ease;
+      }
+
+      .room.light {
+        background: #fff8e8;
+        color: #3b2f1e;
+      }
+
+      .room.dark {
+        background: #17120c;
+        color: #f2e6cf;
+      }
+
+      .room.light p {
+        color: #6b5638;
+      }
+
+      .room.dark p {
+        color: #c9b48f;
+      }
+    </style>
+    <script type="module" src="../dist/index.js"></script>
+  </head>
+  <body>
+    <header>
+      <div class="bar">
+        <span>pull-cord</span>
+        <span class="count">pulls <b id="pulls">0</b></span>
+        <pull-cord id="main"></pull-cord>
+      </div>
+    </header>
+
+    <main>
+      <h1>Drag the cord to switch the lights.</h1>
+      <p class="lede">
+        Grab the handle hanging from the top bar and pull it down. Let go past the click and the page flips between light and
+        dark with a circular reveal from the handle. A plain click or the keyboard works too.
+      </p>
+
+      <h2>Variations</h2>
+      <div class="grid">
+        <div class="stage">
+          <pull-cord hint="hover" locale="pt-BR"></pull-cord>
+          <p><code>locale="pt-BR"</code>, hint only on hover</p>
+        </div>
+        <div class="stage brass">
+          <pull-cord hint="none" muted></pull-cord>
+          <p>Custom colors and a longer cord, muted</p>
+        </div>
+        <div class="stage room" id="room">
+          <pull-cord target="#room" attribute="class" storage-key="room-theme" transition="none" hint-side="right"></pull-cord>
+          <p>Scoped to this panel with <code>attribute="class"</code></p>
+        </div>
+      </div>
+    </main>
+
+    <script type="module">
+      const pulls = document.getElementById('pulls');
+      let count = 0;
+      document.getElementById('main').addEventListener('pull', () => {
+        pulls.textContent = String(++count);
+      });
+    </script>
+  </body>
+</html>
