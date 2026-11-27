@@ -366,8 +366,11 @@ export class GitHubActivity extends Base {
   #wave(canvas: HTMLElement) {
     const box = canvas.getBoundingClientRect();
     if (!box.width) return;
-    canvas.querySelectorAll<HTMLElement>('.grid .cell').forEach((cell) => {
-      const rect = cell.getBoundingClientRect();
+    const cells = Array.from(canvas.querySelectorAll<HTMLElement>('.grid .cell'), (cell) => ({
+      cell,
+      rect: cell.getBoundingClientRect(),
+    }));
+    cells.forEach(({ cell, rect }) => {
       if (!rect.width) return;
       const animation = cell.animate(
         [

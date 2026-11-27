@@ -1,6 +1,6 @@
 {
   "name": "@georgepxto/github-activity",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A dependency-free <github-activity> web component that renders a GitHub contribution calendar, plus a build-time fetcher.",
   "type": "module",
   "license": "MIT",

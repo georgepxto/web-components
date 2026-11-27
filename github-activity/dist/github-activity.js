@@ -312,8 +312,11 @@ export class GitHubActivity extends Base {
         const box = canvas.getBoundingClientRect();
         if (!box.width)
             return;
-        canvas.querySelectorAll('.grid .cell').forEach((cell) => {
-            const rect = cell.getBoundingClientRect();
+        const cells = Array.from(canvas.querySelectorAll('.grid .cell'), (cell) => ({
+            cell,
+            rect: cell.getBoundingClientRect(),
+        }));
+        cells.forEach(({ cell, rect }) => {
             if (!rect.width)
                 return;
             const animation = cell.animate([
