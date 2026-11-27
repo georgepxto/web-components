@@ -74,6 +74,8 @@ export const styles = `
   }
 
   .links {
+    position: relative;
+    isolation: isolate;
     display: flex;
     flex: 0 1 auto;
     align-items: center;
@@ -81,6 +83,28 @@ export const styles = `
     min-width: 0;
     margin-left: auto;
     overflow: hidden;
+  }
+
+  .indicator {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    width: 0;
+    height: 0;
+    border-radius: 999px;
+    background: var(--glass-indicator, color-mix(in oklab, var(--_active) 12%, transparent));
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1),
+      width 0.55s cubic-bezier(0.2, 0.8, 0.2, 1),
+      height 0.55s cubic-bezier(0.2, 0.8, 0.2, 1),
+      opacity 0.3s ease;
+  }
+
+  .indicator.visible {
+    opacity: 1;
   }
 
   ::slotted(a) {
@@ -104,7 +128,7 @@ export const styles = `
 
   ::slotted(a[aria-current='true']) {
     color: var(--_active);
-    background: color-mix(in oklab, var(--_active) 12%, transparent);
+    transition: color 0.3s ease;
   }
 
   ::slotted(a:focus-visible) {
@@ -135,6 +159,12 @@ export const styles = `
 
   :host([wrapped]) .links::-webkit-scrollbar {
     display: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .indicator {
+      transition: opacity 0.3s ease;
+    }
   }
 
   @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {

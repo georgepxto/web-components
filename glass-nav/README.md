@@ -9,7 +9,7 @@ A dependency-free web component for a floating, frosted-glass navigation bar. It
 
 - No runtime dependencies, Shadow DOM, about 4 kB gzipped
 - Your own links and markup in three slots: logo, links and call to action
-- Highlights the current section with `IntersectionObserver` and `aria-current`
+- Highlights the current section with `IntersectionObserver` and `aria-current`, with a pill that slides and stretches from link to link
 - Smooth scrolling that stops below the bar, instant with `prefers-reduced-motion`
 - Takes no space in the page flow
 - In narrow screens the bar wraps into two rows instead of hiding the links behind a menu button
@@ -90,6 +90,7 @@ Links in the `logo` and `cta` slots scroll smoothly too, but only links in the d
 | `--glass-bg` | `#f6f8f6` / `#0b0e0c` | Base color of the glass, used at 58% opacity |
 | `--glass-fg` | `#0d1310` / `#e9eeea` | Text color. The border is mixed from it at 12% |
 | `--glass-active` | `#1d8049` / `#43c97e` | Color of the active link and the focus ring |
+| `--glass-indicator` | `--glass-active` at 12% | Background of the pill behind the active link |
 | `--glass-highlight` | `rgba(255, 255, 255, 0.55)` / `rgba(255, 255, 255, 0.06)` | Inner highlight along the top edge |
 | `--glass-max-width` | `1148px` | Widest the bar gets. It is never wider than the window minus 24px |
 | `--glass-top` | `14px` | Distance from the top of the window |
@@ -105,7 +106,7 @@ glass-nav {
 }
 ```
 
-Style the internals with `::part()`: `nav`, `logo`, `links`, `cta`. Links in the default slot get a pill style; the logo and call to action are left to you. Styles from your page that target `a` directly win over the component's link styles, so scope them if needed, for example `glass-nav a { … }`.
+Style the internals with `::part()`: `nav`, `logo`, `links`, `cta`, `indicator`. Links in the default slot get a pill style, and the `indicator` part is the pill that slides behind the active one; the logo and call to action are left to you. Styles from your page that target `a` directly win over the component's link styles, so scope them if needed, for example `glass-nav a { … }`.
 
 ## Accessibility
 
@@ -113,7 +114,7 @@ Style the internals with `::part()`: `nav`, `logo`, `links`, `cta`. Links in the
 - The active link has `aria-current="true"`
 - After a click, focus moves to the section, so keyboard and screen reader users continue from there. Sections that can't take focus get `tabindex="-1"`
 - The address bar is updated with the section's hash, so the back button works
-- With `prefers-reduced-motion: reduce` the page jumps to the section instead of scrolling
+- With `prefers-reduced-motion: reduce` the page jumps to the section instead of scrolling, and the pill moves to the new link without sliding
 
 ## Browser support
 

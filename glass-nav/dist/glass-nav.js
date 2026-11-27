@@ -37,6 +37,7 @@ export class GlassNav extends Base {
     #nav;
     #clearance = 0;
     #links;
+    #indicator;
     #controller;
     #intersection;
     #mutation;
@@ -56,6 +57,11 @@ export class GlassNav extends Base {
         this.#nav.className = 'pill';
         this.#nav.setAttribute('part', 'nav');
         this.#links = region('links');
+        this.#indicator = document.createElement('span');
+        this.#indicator.className = 'indicator';
+        this.#indicator.setAttribute('part', 'indicator');
+        this.#indicator.setAttribute('aria-hidden', 'true');
+        this.#links.prepend(this.#indicator);
         this.#nav.append(region('logo', 'logo'), this.#links, region('cta', 'cta'));
         shadow.append(this.#nav);
     }
@@ -138,6 +144,7 @@ export class GlassNav extends Base {
         }
         this.#sections = Array.from(byId.values()).sort((a, b) => a.element.compareDocumentPosition(b.element) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1);
         this.#observe();
+        this.#placeIndicator(true);
     }
     #observe() {
         this.#intersection?.disconnect();
@@ -186,6 +193,7 @@ export class GlassNav extends Base {
         if (id === this.#active)
             return;
         this.#active = id;
+        this.#placeIndicator();
         this.dispatchEvent(new CustomEvent('activechange', { bubbles: true, detail: { id } }));
     }
     #unlock() {
@@ -236,12 +244,38 @@ export class GlassNav extends Base {
         const overflowing = this.#links.scrollWidth > this.#links.clientWidth + 1;
         if (overflowing)
             this.setAttribute('wrapped', '');
+        this.#placeIndicator(true);
         const clearance = Math.ceil((parseFloat(getComputedStyle(this.#nav).top) || 0) + this.#nav.offsetHeight + CLEARANCE);
         if (clearance === this.#clearance)
             return;
         this.#clearance = clearance;
         if (this.#sections.length)
             this.#observe();
+    }
+    #placeIndicator(snap = false) {
+        const indicator = this.#indicator;
+        const link = this.#sections
+            .find((section) => section.id === this.#active)
+            ?.links.find((candidate) => candidate.getClientRects().length > 0);
+        if (!link || !this.#links.clientWidth) {
+            indicator.classList.remove('visible');
+            return;
+        }
+        const box = this.#links.getBoundingClientRect();
+        const rect = link.getBoundingClientRect();
+        const x = rect.left - box.left - this.#links.clientLeft + this.#links.scrollLeft;
+        const y = rect.top - box.top - this.#links.clientTop + this.#links.scrollTop;
+        const instant = snap || !indicator.classList.contains('visible');
+        if (instant)
+            indicator.style.transitionProperty = 'opacity';
+        indicator.style.transform = `translate(${x}px, ${y}px)`;
+        indicator.style.width = `${rect.width}px`;
+        indicator.style.height = `${rect.height}px`;
+        if (instant)
+            void indicator.offsetWidth;
+        indicator.classList.add('visible');
+        if (instant)
+            indicator.style.transitionProperty = '';
     }
 }
 if (typeof customElements !== 'undefined' && !customElements.get(TAG)) {
