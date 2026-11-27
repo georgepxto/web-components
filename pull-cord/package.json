@@ -1,6 +1,6 @@
 {
   "name": "@georgepxto/pull-cord",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A dependency-free <pull-cord> web component: a hanging light-switch cord you drag to toggle light and dark themes, with spring physics and a circular reveal.",
   "type": "module",
   "license": "MIT",

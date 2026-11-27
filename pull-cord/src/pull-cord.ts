@@ -39,6 +39,17 @@ const DAMPING = 2.4;
 const KICK = 72;
 const MAX_SPEED = 420;
 const HINT_DURATION = 5000;
+const REVEAL = 680;
+const REVEAL_STEPS = 24;
+const STRAIN_AFTER = 700;
+const BREAK_AFTER = 1900;
+const FALL = 950;
+const FALL_STEPS = 12;
+const RESPAWN_DELAY = 350;
+const DROP = 900;
+const GRAVITY_EASE = 'cubic-bezier(.5, 0, .9, .55)';
+
+const coverage = (t: number) => (1 - Math.cos(Math.PI * t)) / 2;
 
 const Base = (typeof HTMLElement === 'undefined' ? class {} : HTMLElement) as typeof HTMLElement;
 
@@ -93,6 +104,7 @@ export class PullCord extends Base {
   #line: HTMLSpanElement;
   #handle: HTMLButtonElement;
   #pill: HTMLSpanElement;
+  #tail: HTMLSpanElement;
   #hint: HTMLSpanElement;
 
   #theme: Theme | null = null;
@@ -114,6 +126,13 @@ export class PullCord extends Base {
   #hintTimer = 0;
   #clickTimer = 0;
   #ownsName = false;
+  #broken = false;
+  #strainFrame = 0;
+  #armedAt = 0;
+  #lastCreak = 0;
+  #shake = { x: 0, y: 0 };
+  #tremor = 0;
+  #respawnTimer = 0;
 
   constructor() {
     super();
@@ -126,18 +145,20 @@ export class PullCord extends Base {
     this.#line = element('span', 'line', 'line');
     this.#handle = element('button', 'handle', 'handle');
     this.#pill = element('span', 'pill', 'pill');
+    this.#tail = element('span', 'tail', 'tail');
     this.#hint = element('span', 'hint', 'hint');
     const mount = element('span', 'mount', 'mount');
 
     this.#line.setAttribute('aria-hidden', 'true');
     this.#hint.setAttribute('aria-hidden', 'true');
+    this.#tail.setAttribute('aria-hidden', 'true');
     mount.setAttribute('aria-hidden', 'true');
     this.#handle.type = 'button';
     this.#handle.setAttribute('role', 'switch');
     this.#handle.setAttribute('aria-checked', 'false');
 
     this.#pill.append(element('span', 'dot', 'dot'));
-    this.#handle.append(this.#pill, this.#hint);
+    this.#handle.append(this.#tail, this.#pill, this.#hint);
     this.#swing.append(this.#line, this.#handle);
     sway.append(this.#swing);
     this.#root.append(sway, mount);
@@ -221,8 +242,13 @@ export class PullCord extends Base {
     this.#observer = undefined;
     window.clearTimeout(this.#hintTimer);
     window.clearTimeout(this.#clickTimer);
+    window.clearTimeout(this.#respawnTimer);
+    this.#stopStrain();
     this.#holdSwing();
     this.#stopMotion();
+    this.#broken = false;
+    this.#handle.style.removeProperty('--tail');
+    this.#root.classList.remove('broken');
     this.#setPull(0);
     this.#drag = null;
     this.#angle = 0;
@@ -358,12 +384,34 @@ export class PullCord extends Base {
     } catch {}
   }
 
+  #crack() {
+    if (this.hasAttribute('muted')) return;
+    try {
+      audio ??= new AudioContext();
+      if (audio.state === 'suspended') void audio.resume();
+      const length = Math.round(audio.sampleRate * 0.09);
+      const buffer = audio.createBuffer(1, length, audio.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let index = 0; index < length; index++) data[index] = (Math.random() * 2 - 1) * (1 - index / length) ** 3;
+      const source = audio.createBufferSource();
+      const filter = audio.createBiquadFilter();
+      const volume = audio.createGain();
+      source.buffer = buffer;
+      filter.type = 'highpass';
+      filter.frequency.value = 1400;
+      volume.gain.value = 0.22;
+      source.connect(filter).connect(volume).connect(audio.destination);
+      source.start(audio.currentTime);
+    } catch {}
+  }
+
   #origin() {
     const rect = this.#pill.getBoundingClientRect();
     return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
   }
 
   #switch() {
+    if (this.#transition) return;
     const previous = this.#current();
     const next = opposite(previous);
     const pull = new CustomEvent<PullDetail>('pull', {
@@ -401,18 +449,17 @@ export class PullCord extends Base {
     transition.ready
       .then(() => {
         const radius = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
-        const closed = `circle(0px at ${x}px ${y}px)`;
-        const open = `circle(${radius}px at ${x}px ${y}px)`;
         const lighting = next === 'light';
-        html.animate(
-          { clipPath: lighting ? [closed, open] : [open, closed] },
-          {
-            duration: lighting ? 800 : 560,
-            easing: lighting ? 'cubic-bezier(.55, 0, .2, 1)' : 'cubic-bezier(.6, 0, .85, .35)',
-            fill: 'forwards',
-            pseudoElement: lighting ? '::view-transition-new(root)' : '::view-transition-old(root)',
-          },
-        );
+        const frames = Array.from({ length: REVEAL_STEPS + 1 }, (_, index) => {
+          const t = index / REVEAL_STEPS;
+          const area = lighting ? coverage(t) : 1 - coverage(t);
+          return { offset: t, clipPath: `circle(${(radius * Math.sqrt(area)).toFixed(1)}px at ${x}px ${y}px)` };
+        });
+        html.animate(frames, {
+          duration: REVEAL,
+          fill: 'forwards',
+          pseudoElement: lighting ? '::view-transition-new(root)' : '::view-transition-old(root)',
+        });
       })
       .catch(() => {});
 
@@ -428,8 +475,9 @@ export class PullCord extends Base {
   }
 
   #setPull(offset: number) {
+    const { x, y } = this.#shake;
     this.#line.style.height = offset ? `${this.#rest + offset}px` : '';
-    this.#handle.style.transform = offset ? `translateY(${offset}px)` : '';
+    this.#handle.style.transform = offset || x || y ? `translate(${x}px, ${offset + y}px)` : '';
   }
 
   #measureRest() {
@@ -442,7 +490,8 @@ export class PullCord extends Base {
   }
 
   #render() {
-    this.#swing.style.transform = this.#angle ? `rotate(${this.#angle}deg)` : '';
+    const angle = this.#angle + this.#tremor;
+    this.#swing.style.transform = angle ? `rotate(${angle}deg)` : '';
   }
 
   #step = (time: number) => {
@@ -518,11 +567,170 @@ export class PullCord extends Base {
     if (!this.#drag || this.#drag.armed === armed) return;
     this.#drag.armed = armed;
     this.#handle.classList.toggle('armed', armed);
-    if (armed) this.#tone(900, 220, 0.03, 0.03);
+    if (armed) {
+      this.#tone(900, 220, 0.03, 0.03);
+      if (this.hasAttribute('no-break')) return;
+      this.#armedAt = performance.now();
+      this.#lastCreak = 0;
+      if (!this.#strainFrame) this.#strainFrame = requestAnimationFrame(this.#strain);
+    } else {
+      this.#stopStrain();
+      this.#setPull(this.#drag.stretch);
+    }
+  }
+
+  #stopStrain() {
+    cancelAnimationFrame(this.#strainFrame);
+    this.#strainFrame = 0;
+    this.#shake = { x: 0, y: 0 };
+    this.#tremor = 0;
+    this.#render();
+    this.#root.style.removeProperty('--strain');
+  }
+
+  #strain = () => {
+    this.#strainFrame = 0;
+    const drag = this.#drag;
+    if (!drag?.armed) return;
+    const time = performance.now();
+    const held = time - this.#armedAt;
+    if (held >= BREAK_AFTER) {
+      this.#snap();
+      return;
+    }
+
+    const strain = Math.max(0, (held - STRAIN_AFTER) / (BREAK_AFTER - STRAIN_AFTER));
+    this.#root.style.setProperty('--strain', strain.toFixed(3));
+    const amount = this.#reducedMotion?.matches ? 0 : strain ** 1.4 * 3.6;
+    this.#shake = { x: (Math.random() * 2 - 1) * amount, y: (Math.random() * 2 - 1) * amount * 0.6 };
+    this.#tremor = (Math.random() * 2 - 1) * amount * 0.5;
+    this.#setPull(drag.stretch);
+    this.#render();
+    if (strain > 0 && time - this.#lastCreak > 260 - 170 * strain) {
+      this.#lastCreak = time;
+      this.#tone(150 + 130 * strain, 90, 0.01 + 0.02 * strain, 0.025);
+    }
+    this.#strainFrame = requestAnimationFrame(this.#strain);
+  };
+
+  #snap() {
+    const ended = this.#drag;
+    if (!ended) return;
+    this.#drag = null;
+    this.#broken = true;
+    this.#suppressClick = true;
+    this.#stopStrain();
+    this.#holdSwing();
+    this.#stopMotion();
+    this.#root.classList.remove('active');
+    this.#handle.classList.remove('armed');
+    this.#root.classList.add('broken');
+    if (this.#handle.hasPointerCapture(ended.id)) this.#handle.releasePointerCapture(ended.id);
+
+    this.dispatchEvent(new CustomEvent('break', { bubbles: true, composed: true }));
+    this.#crack();
+    this.#switch();
+
+    if (this.#reducedMotion?.matches) {
+      this.#setPull(0);
+      this.#respawnTimer = window.setTimeout(() => this.#respawn(), 700);
+      return;
+    }
+
+    const length = this.#rest + ended.stretch;
+    const stub = Math.round(length * 0.42);
+    this.#handle.style.setProperty('--tail', `${Math.round(length - stub)}px`);
+    this.#setPull(0);
+
+    const theta = (this.#angle * Math.PI) / 180;
+    const direction = Math.sign(this.#angle) || (Math.random() < 0.5 ? -1 : 1);
+    const spin = direction * (110 + Math.random() * 70);
+    const local = (x: number, y: number) => ({
+      x: x * Math.cos(theta) + y * Math.sin(theta),
+      y: -x * Math.sin(theta) + y * Math.cos(theta),
+    });
+
+    this.#motion = [
+      this.#line.animate(
+        [
+          { height: `${stub}px`, easing: 'cubic-bezier(.2, .8, .3, 1)' },
+          { height: '4px', offset: 0.4, easing: SPRING_EASE },
+          { height: '13px', offset: 0.65, easing: SPRING_EASE },
+          { height: '8px', offset: 0.85, easing: SPRING_EASE },
+          { height: '10px' },
+        ],
+        { duration: 700, fill: 'forwards' },
+      ),
+      this.#handle.animate(
+        Array.from({ length: FALL_STEPS + 1 }, (_, index) => {
+          const t = index / FALL_STEPS;
+          const point = local(direction * 46 * t, 460 * t * t - 18 * t);
+          return {
+            offset: t,
+            transform: `translate(${point.x.toFixed(1)}px, ${(ended.stretch + point.y).toFixed(1)}px) rotate(${(spin * t * t).toFixed(1)}deg)`,
+            opacity: t < 0.55 ? 1 : 1 - (t - 0.55) / 0.45,
+          };
+        }),
+        { duration: FALL, fill: 'forwards' },
+      ),
+    ];
+
+    this.#motion[1].finished
+      .then(() => {
+        this.#swingFree();
+        this.#respawnTimer = window.setTimeout(() => this.#respawn(), RESPAWN_DELAY);
+      })
+      .catch(() => {});
+  }
+
+  #respawn() {
+    this.#respawnTimer = 0;
+    this.#stopMotion();
+    this.#handle.style.removeProperty('--tail');
+    this.#setPull(0);
+    this.#holdSwing();
+    this.#angle = 0;
+    this.#velocity = 0;
+    this.#render();
+    this.#broken = false;
+
+    if (this.#reducedMotion?.matches) {
+      this.#root.classList.remove('broken');
+      return;
+    }
+
+    this.#measureRest();
+    const rest = this.#rest;
+    const drop = [-rest, 12, -5, 2, 0];
+    const offsets = [0, 0.5, 0.7, 0.86, 1];
+    const easings = [GRAVITY_EASE, SPRING_EASE, SPRING_EASE, SPRING_EASE, SPRING_EASE];
+    this.#motion = [
+      this.#line.animate(
+        drop.map((value, index) => ({ height: `${rest + value}px`, offset: offsets[index], easing: easings[index] })),
+        DROP,
+      ),
+      this.#handle.animate(
+        drop.map((value, index) => ({
+          transform: `translateY(${value}px)`,
+          opacity: index === 0 ? 0 : 1,
+          offset: offsets[index],
+          easing: easings[index],
+        })),
+        DROP,
+      ),
+    ];
+    this.#root.classList.remove('broken');
+    this.#tone(500, 900, 0.02, 0.04);
+    this.#motion[1].finished
+      .then(() => {
+        this.#velocity += 34 * (Math.random() < 0.5 ? -1 : 1);
+        this.#swingFree();
+      })
+      .catch(() => {});
   }
 
   #onPointerDown(event: PointerEvent) {
-    if (event.button !== 0 || this.#drag) return;
+    if (event.button !== 0 || this.#drag || this.#broken) return;
     this.#suppressClick = false;
     this.#stopMotion();
     this.#setPull(0);
@@ -577,6 +785,7 @@ export class PullCord extends Base {
     const ended = this.#drag;
     if (!ended || event.pointerId !== ended.id) return;
     this.#drag = null;
+    this.#stopStrain();
     this.#root.classList.remove('active');
     this.#handle.classList.remove('armed');
     if (this.#handle.hasPointerCapture(event.pointerId)) this.#handle.releasePointerCapture(event.pointerId);
@@ -610,6 +819,7 @@ export class PullCord extends Base {
       this.#suppressClick = false;
       return;
     }
+    if (this.#broken || this.#transition) return;
 
     this.#root.classList.remove('hinting');
 

@@ -8,11 +8,12 @@ A dependency-free web component that hangs a light-switch cord from your header.
 </picture>
 
 - No runtime dependencies, Shadow DOM, about 7 kB gzipped
-- Spring physics: the cord sways at rest, swings when you brush past it, stretches as you pull and bounces back on release
-- Circular theme reveal with the View Transitions API, skipped where unsupported or for visitors who prefer reduced motion
+- Spring physics: the cord sways at rest, swings when you brush past it, follows the pointer to either side, stretches as you pull and bounces back on release
+- Hold it stretched for too long and it strains, shakes and snaps: the theme switches from the break, the handle falls and a new cord drops in from the top
+- Circular theme reveal with the View Transitions API, at an even pace in both directions, skipped where unsupported or for visitors who prefer reduced motion
 - Remembers the choice in `localStorage`, follows the system theme until the visitor picks one, and stays in sync across tabs and across several cords on the page
 - Accessible: the handle is a real `switch` button, so a click, <kbd>Enter</kbd> or <kbd>Space</kbd> also toggles it
-- A short click sound made with Web Audio, which you can turn off with `muted`
+- Short click, creak and snap sounds made with Web Audio, which you can turn off with `muted`
 - English, Portuguese and Spanish built in, any other language through `labels`
 
 <img alt="Halfway through the switch: a light circle centred on the cord handle has covered the right half of the dark page" src="https://raw.githubusercontent.com/georgepxto/web-components/main/pull-cord/screenshots/transition.png" width="880">
@@ -122,6 +123,7 @@ With `attribute="class"` the cord toggles the `dark` and `light` classes instead
 | `hint-side` | `left` | `right` puts the hint on the right of the handle |
 | `locale` | page language | Language of the hint and accessible label |
 | `muted` | | Turns off the click sound |
+| `no-break` | | The cord never snaps, however long it is held |
 | `theme` | | Reflects the current theme, `light` or `dark`. Set by the component, read it from CSS |
 
 ### Properties and methods
@@ -138,8 +140,9 @@ With `attribute="class"` the cord toggles the `dark` and `light` classes instead
 | --- | --- | --- |
 | `pull` | `{ theme, previous }` | Fired on every pull, before the theme changes. Call `preventDefault()` to keep the current theme |
 | `themechange` | `{ theme, previous, source }` | Fired after the component changes the theme. `source` is `pull`, `property`, `system` or `storage` |
+| `break` | | Fired when the cord snaps after being held stretched for about two seconds. A `pull` follows it |
 
-Both events bubble and cross shadow boundaries.
+All events bubble and cross shadow boundaries.
 
 ```js
 const cord = document.querySelector('pull-cord');
@@ -180,7 +183,9 @@ pull-cord {
 }
 ```
 
-For anything else, style the parts: `line`, `mount`, `handle`, `pill`, `dot` and `hint`.
+While the cord strains before snapping, the line fades from `--pull-cord-line` to the accent.
+
+For anything else, style the parts: `line`, `mount`, `handle`, `pill`, `dot`, `hint` and `tail` (the piece of cord that falls with the handle).
 
 ```css
 pull-cord::part(hint) {

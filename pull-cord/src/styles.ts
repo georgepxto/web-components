@@ -91,6 +91,26 @@ export const styles = `
     height: var(--_length);
     margin-left: -0.75px;
     background: var(--_line);
+    background: color-mix(in oklab, var(--_line), var(--_accent) calc(var(--strain, 0) * 85%));
+  }
+
+  .tail {
+    position: absolute;
+    bottom: calc(50% + 13px);
+    left: 50%;
+    display: none;
+    width: 1.5px;
+    height: var(--tail, 0px);
+    margin-left: -0.75px;
+    background: var(--_line);
+  }
+
+  .root.broken .tail {
+    display: block;
+  }
+
+  .root.broken .handle {
+    pointer-events: none;
   }
 
   .handle {
@@ -188,7 +208,8 @@ export const styles = `
     transform: translate(0, -50%);
   }
 
-  .root.active .hint {
+  .root.active .hint,
+  .root.broken .hint {
     opacity: 0;
   }
 
@@ -199,6 +220,14 @@ export const styles = `
   @media (prefers-reduced-motion: reduce) {
     .sway {
       animation: none;
+    }
+
+    .handle {
+      transition: opacity 0.2s ease;
+    }
+
+    .root.broken .handle {
+      opacity: 0;
     }
 
     .hint {
